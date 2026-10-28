@@ -13,16 +13,21 @@ A personal dashboard for habits and goals, gym lifts, boxing and cardio, body we
 
 ## How it runs
 
-`index.html` is the whole app: one self-contained page (HTML, CSS and JavaScript). No build step, no dependencies, no backend. Fonts load from Google Fonts (Young Serif, Nunito, Caveat).
+`index.html` is the whole app: one self-contained page (HTML, CSS and JavaScript). No build step and no bundler; Firebase loads from a CDN only if you have configured it. Fonts load from Google Fonts (Young Serif, Nunito, Caveat).
 
 It is built mobile-first — a bottom tab bar on phones, top tabs on wider screens — and works offline once the fonts are cached.
 
 ## Where your entries are saved
 
-- Opened as a Claude artifact: to your private Claude account, so they follow you between devices.
-- Anywhere else (GitHub Pages, a local file): to that browser's `localStorage`. Entries stay on that one browser, and clearing site data erases them.
+The page picks the best of three, in this order:
 
-To move data between the two, use **Back up everything** in the footer on one device and **Restore a backup** on the other. The restore merges rather than overwrites: identical entries are skipped, and where the same entry differs it keeps whichever copy was edited more recently, so importing the same file twice changes nothing.
+1. **Your Google account**, once you sign in — entries live in Firestore under `users/{uid}` and sync live across every device. Needs the one-time setup in [SETUP.md](SETUP.md).
+2. **Your Claude account**, when the page is opened as a Claude artifact.
+3. **That browser's `localStorage`**, otherwise. Entries stay on the one browser and clearing site data erases them.
+
+Signing in moves anything already in the browser up to your account, without duplicating what is already there. While signed in the browser copy is kept as a live mirror, so the data is in two places rather than one.
+
+There is also **Back up everything** / **Restore a backup** in the footer for moving entries by hand. The restore merges rather than overwrites: identical entries are skipped, and where the same entry differs it keeps whichever copy was edited more recently, so importing the same file twice changes nothing.
 
 ## Run locally
 

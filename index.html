@@ -529,6 +529,7 @@ textarea.in{resize:vertical}
 
   <footer class="foot">
     <p class="muted" id="foot-note"></p>
+    <div class="chips" id="account" hidden></div>
     <div class="chips">
       <span class="chips" id="exports" hidden>
         <button class="chip" data-act="exp-journal" type="button">Export journal</button>
@@ -544,6 +545,24 @@ textarea.in{resize:vertical}
 <script>
 (function(){
 'use strict';
+
+/* ---------- GOOGLE SYNC (Firebase) ----------
+   Paste the config from the Firebase console here: Project settings ->
+   General -> Your apps -> Web app -> SDK setup and configuration -> Config.
+   These values are public by design; your data is protected by the
+   Firestore security rules, not by hiding this. Leave it as-is to keep
+   using plain browser storage. Firebase is skipped inside Claude, which
+   syncs through your Claude account instead.                            */
+const FB_CONFIG={
+  apiKey:'PASTE_API_KEY',
+  authDomain:'PASTE_PROJECT.firebaseapp.com',
+  projectId:'PASTE_PROJECT',
+  storageBucket:'PASTE_PROJECT.firebasestorage.app',
+  messagingSenderId:'PASTE_SENDER_ID',
+  appId:'PASTE_APP_ID'
+};
+const FB_SDK='https://www.gstatic.com/firebasejs/10.14.1/';
+function fbSet(){return !!FB_CONFIG.apiKey&&FB_CONFIG.apiKey.indexOf('PASTE')!==0;}
 
 /* ---------- helpers ---------- */
 const $=(s,r)=>(r||document).querySelector(s);
@@ -595,9 +614,11 @@ let raf=0;
 function touch(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;renderCurrent();});}
 function setSync(k){
   const el=$('#sync');el.dataset.k=k;
-  el.textContent=k==='db'?'Private · synced to your account':k==='local'?'Saved in this browser only':k==='error'?'Couldn’t save. Check your connection.':'Opening…';
-  $('#foot-note').textContent=k==='db'?'Your entries live in your own private space. Nobody else who opens this page can see them.':k==='local'?'Open this page signed in to keep your data across devices. Until then it stays in this browser.':'';
+  el.textContent=k==='db'?'Private · synced to your account':k==='cloud'?'Synced to your Google account':k==='local'?(fbSet()&&!window.claude?'Saved in this browser · not synced':'Saved in this browser only'):k==='error'?'Couldn’t save. Check your connection.':'Opening…';
+  $('#foot-note').textContent=k==='db'?'Your entries live in your own private space. Nobody else who opens this page can see them.':k==='cloud'?'Your entries live in your own Firestore space. Only your Google account can read them.':k==='local'?'Entries stay in this browser. Sign in below, or open this page inside Claude, to carry them between devices.':'';
 }
+const LS_KEY='daybook:v1';
+function lsSave(){try{localStorage.setItem(LS_KEY,JSON.stringify(S));}catch(e){if(backend.kind!=='cloud')setSync('error');}}
 const ready=initStore();
 function enqueue(key,fn){
   chains[key]=(chains[key]||Promise.resolve()).then(async()=>{await ready;await fn();}).catch(e=>{console.error(e);setSync('error');});
@@ -629,10 +650,8 @@ async function initStore(){
       },err=>{loaded.add(col);setSync('error');touch();});
     });
   }else{
-    const KEY='daybook:v1';
-    try{const j=JSON.parse(localStorage.getItem(KEY)||'{}');COLS.forEach(c=>{S[c]=j[c]||{};});}catch(e){}
-    const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){setSync('error');}};
-    backend={kind:'local',set:save,del:save};
+    try{const j=JSON.parse(localStorage.getItem(LS_KEY)||'{}');COLS.forEach(c=>{S[c]=j[c]||{};});}catch(e){}
+    backend={kind:'local',set:lsSave,del:lsSave};
     COLS.forEach(c=>loaded.add(c));
     setSync('local');touch();
   }
@@ -1107,6 +1126,95 @@ function renderBody(){
 }
 
 
+/* ---------- GOOGLE SYNC (Firebase) ---------- */
+let fbApi=null,fbDb=null,fbAuth=null,fbUser=null,fbWas=false,fbUnsubs=[],fbNote='';
+
+function fbStop(){fbUnsubs.forEach(f=>{try{f();}catch(e){}});fbUnsubs=[];}
+function renderAcct(){
+  const el=$('#account');
+  if(window.claude||!fbSet()){el.hidden=true;return;}
+  el.hidden=false;
+  if(fbUser){
+    const who=fbUser.email||fbUser.displayName||'your Google account';
+    el.innerHTML='<span class="muted">Synced as '+esc(who)+'</span><button class="chip" data-act="fb-out" type="button">Sign out</button>';
+  }else{
+    el.innerHTML='<button class="chip" data-act="fb-in" type="button">Sign in with Google</button><span class="muted">'+esc(fbNote||'Sync your entries across every device.')+'</span>';
+  }
+}
+async function fbStart(){
+  renderAcct();
+  if(window.claude||!fbSet())return;
+  let A,P,F;
+  try{
+    const r=await Promise.all([import(FB_SDK+'firebase-app.js'),import(FB_SDK+'firebase-auth.js'),import(FB_SDK+'firebase-firestore.js')]);
+    A=r[0];P=r[1];F=r[2];
+  }catch(e){fbNote='Couldn’t load Firebase. Check your connection and reload.';renderAcct();return;}
+  try{
+    const app=A.initializeApp(FB_CONFIG);
+    try{fbDb=F.initializeFirestore(app,{localCache:F.persistentLocalCache({tabManager:F.persistentMultipleTabManager()})});}
+    catch(e){fbDb=F.getFirestore(app);}
+    fbAuth=P.getAuth(app);fbApi={A:A,P:P,F:F};
+    P.getRedirectResult(fbAuth).catch(()=>{});
+    P.onAuthStateChanged(fbAuth,u=>{
+      fbUser=u||null;
+      if(u){fbWas=true;fbSignedIn(u);}
+      else if(fbWas){fbWas=false;location.reload();}
+      else renderAcct();
+    });
+  }catch(e){fbNote='Firebase didn’t start. Check FB_CONFIG in index.html.';renderAcct();}
+}
+async function fbSignIn(){
+  if(!fbApi)return;
+  const P=fbApi.P,prov=new P.GoogleAuthProvider();
+  try{await P.signInWithPopup(fbAuth,prov);}
+  catch(e){
+    const c=(e&&e.code)||'';
+    if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request')return;
+    if(c==='auth/popup-blocked'||c==='auth/operation-not-supported-in-this-environment'){
+      try{await P.signInWithRedirect(fbAuth,prov);}catch(e2){toast('Couldn’t open Google sign-in');}
+      return;
+    }
+    if(c==='auth/unauthorized-domain')toast('Add this site under Firebase → Authentication → Settings → Authorized domains');
+    else if(c==='auth/network-request-failed')toast('No connection to Google');
+    else toast('Sign-in failed'+(c?' ('+c+')':''));
+  }
+}
+async function fbSignOut(){try{await fbApi.P.signOut(fbAuth);}catch(e){toast('Couldn’t sign out');}}
+async function fbSignedIn(u){
+  const F=fbApi.F,root=F.doc(fbDb,'users',u.uid);
+  fbStop();renderAcct();setSync('cloud');
+  const mine={};COLS.forEach(c=>{mine[c]=Object.assign({},S[c]);});
+  try{await fbMigrate(root,mine);}catch(e){}
+  COLS.forEach(col=>{
+    try{
+      fbUnsubs.push(F.onSnapshot(F.collection(root,col),snap=>{
+        const m={};snap.forEach(d=>{m[d.id]=d.data();});
+        S[col]=m;loaded.add(col);lsSave();setSync('cloud');touch();
+      },err=>{loaded.add(col);setSync('error');touch();}));
+    }catch(e){loaded.add(col);}
+  });
+  backend={kind:'cloud',
+    set:(col,id,data)=>{lsSave();return F.setDoc(F.doc(F.collection(root,col),id),data);},
+    del:(col,id)=>{lsSave();return F.deleteDoc(F.doc(F.collection(root,col),id));}};
+  touch();
+}
+async function fbMigrate(root,mine){
+  const F=fbApi.F;let n=0;
+  for(const col of COLS){
+    const ids=Object.keys(mine[col]||{});
+    if(!ids.length)continue;
+    const snap=await F.getDocs(F.collection(root,col));
+    const theirs={};snap.forEach(d=>{theirs[d.id]=d.data();});
+    for(const id of ids){
+      const a=mine[col][id],b=theirs[id];
+      if(b&&JSON.stringify(a)===JSON.stringify(b))continue;
+      if(b&&(b.updated||b.created||0)>=(a.updated||a.created||0))continue;
+      await F.setDoc(F.doc(F.collection(root,col),id),a);n++;
+    }
+  }
+  if(n)toast('Moved '+n+(n===1?' entry':' entries')+' into your account');
+}
+
 /* ---------- exports ---------- */
 async function exportFile(name,data){
   const d=window.__dl;if(!d)return;
@@ -1167,6 +1275,8 @@ const H={
   'j-new':()=>{$('#j-search').value='';jOpen(today());$('#j-text').focus();},
   'j-open':t=>{jOpen(t.dataset.d);if(window.innerWidth<=820)$('#j-text').scrollIntoView({behavior:'smooth',block:'center'});},
   'r-pace':t=>{roadPace=t.dataset.p;renderBody();},
+  'fb-in':()=>fbSignIn(),
+  'fb-out':()=>fbSignOut(),
   'imp-pick':()=>$('#imp-file').click(),
   'exp-journal':()=>{const t=journalText();if(!t){toast('No journal entries to export yet');return;}exportFile('daybook-journal.txt',t);},
   'exp-all':()=>exportFile('daybook-backup.json',JSON.stringify(S,null,2))
@@ -1231,5 +1341,6 @@ $('#imp-file').addEventListener('change',e=>{
 ['#g-date','#c-date','#w-date'].forEach(s=>{$(s).value=today();$(s).max=today();});
 renderBuilder();
 showView(location.hash.slice(1),false);
+fbStart();
 })();
 </script>
