@@ -1,5 +1,12 @@
 <title>Daybook</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#f3ece1" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#211b16" media="(prefers-color-scheme:dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Daybook">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Nunito:wght@400;600;700;800&family=Young+Serif&display=swap">
@@ -238,6 +245,11 @@ textarea.in{resize:vertical}
   .bars .b{grid-template-columns:90px minmax(0,1fr) 54px}
   .card{padding:16px}
   .wk-nav b{min-width:0;flex:1}
+  .card-h a,.link{padding:9px 0}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tile{padding:14px}
+  .tile .val{font-size:24px}
+  .strip{gap:14px}
 }
 @media (prefers-reduced-motion:no-preference){
   .bar>i,.bars .trk i{transition:width .4s ease}
@@ -262,19 +274,6 @@ textarea.in{resize:vertical}
 .chart .mk{fill:var(--surface);stroke:var(--accent);stroke-width:1.8}
 .chart .mk.end{fill:var(--accent-soft);stroke-width:2.2}
 
-/* coach */
-.md{font-size:15.5px;line-height:1.6;overflow-wrap:anywhere}
-.md h3{font:400 18px/1.3 var(--f-display);margin:18px 0 6px}
-.md h3:first-child{margin-top:0}
-.md h4{font:800 13px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 4px}
-.md p{margin:6px 0}
-.md ul{margin:6px 0;padding-left:20px}
-.md li{margin:3px 0}
-.chat-log{display:flex;flex-direction:column;gap:12px;max-height:540px;overflow-y:auto;margin-bottom:12px}
-.chat-log:empty{display:none}
-.bub{padding:12px 14px;border-radius:14px;max-width:94%;min-width:0}
-.bub.me{align-self:flex-end;background:var(--accent-soft);overflow-wrap:anywhere}
-.bub.ai{align-self:flex-start;background:var(--surface-2);border:1px solid var(--line)}
 .chat-form{display:flex;gap:10px;align-items:center}
 @media (max-width:720px){
   .nav a span{font-size:10.5px}
@@ -458,11 +457,11 @@ textarea.in{resize:vertical}
       </div>
     </section>
 
-    <!-- COACH -->
-    <section class="view" id="v-coach" hidden>
+    <!-- BODY -->
+    <section class="view" id="v-body" hidden>
       <div class="vh">
-        <h1>Body &amp; coach</h1>
-        <p class="lede">Weigh in, see the road to your goal, and ask your trainer for a plan that fits your week.</p>
+        <h1>Body</h1>
+        <p class="lede">Weigh in, watch the trend, and see how far the goal really is.</p>
       </div>
       <div class="card">
         <div class="card-h"><h2>Weight</h2></div>
@@ -494,54 +493,10 @@ textarea.in{resize:vertical}
         </div>
       </div>
       <div class="card" style="margin-top:16px">
-        <div class="card-h"><h2>About you</h2><span class="muted">Your trainer reads this. It stays in your private space.</span></div>
+        <div class="card-h"><h2>About you</h2><span class="muted">Only used to sanity-check a goal weight.</span></div>
         <form id="p-form" class="fgrid">
-          <div class="field"><label class="lab" for="p-age">Age</label><input class="in num" id="p-age" type="number" min="10" max="100" inputmode="numeric"></div>
-          <div class="field"><label class="lab" for="p-sex">Sex, for calorie estimates</label><select class="in" id="p-sex"><option value="">Prefer not to say</option><option value="Male">Male</option><option value="Female">Female</option></select></div>
-          <div class="field"><label class="lab" for="p-height">Height (cm)</label><input class="in num" id="p-height" type="number" min="100" max="250" inputmode="numeric"></div>
-          <div class="field"><label class="lab" for="p-activity">Day-to-day activity</label><select class="in" id="p-activity"><option>Mostly sitting</option><option selected>Lightly active</option><option>Active</option><option>Very active</option></select></div>
-          <div class="field"><label class="lab" for="p-days">Gym days per week</label><select class="in" id="p-days"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select></div>
-          <div class="field"><label class="lab" for="p-exp">Lifting experience</label><select class="in" id="p-exp"><option selected>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
-          <div class="field"><label class="lab" for="p-equip">Equipment</label><select class="in" id="p-equip"><option selected>Full gym</option><option>Dumbbells at home</option><option>Bodyweight only</option></select></div>
-          <div class="field"><label class="lab" for="p-box">Boxing</label><select class="in" id="p-box"><option selected>Plan to start</option><option>Already boxing</option><option>Skip boxing, other cardio</option></select></div>
-          <div class="field" style="grid-column:1 / -1"><label class="lab" for="p-diet">Food notes</label><input class="in" id="p-diet" maxlength="200" placeholder="e.g. halal, no dairy, student budget, cooks on Sundays" autocomplete="off"></div>
-          <div class="field" style="grid-column:1 / -1"><label class="lab" for="p-limits">Injuries or limits</label><input class="in" id="p-limits" maxlength="200" placeholder="e.g. sore left knee, no overhead pressing" autocomplete="off"></div>
+          <div class="field"><label class="lab" for="p-height">Height (cm)</label><input class="in num" id="p-height" type="number" min="100" max="250" inputmode="numeric" placeholder="178"></div>
         </form>
-      </div>
-      <div class="card" id="key-card" style="margin-top:16px" hidden>
-        <div class="card-h"><h2>Connect your trainer</h2></div>
-        <p class="muted" style="margin-bottom:12px">Outside Claude, the trainer needs your own Anthropic API key, billed to your API account. It is saved only in this browser, never in the page's code. Use a key with a spending limit, and only on a device you trust. <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">Get a key</a></p>
-        <form id="key-form" class="chat-form">
-          <label class="sr-only" for="key-in">Anthropic API key</label>
-          <input class="in" id="key-in" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…">
-          <button class="btn" type="submit">Save key</button>
-          <button class="link" type="button" data-act="key-clear" id="key-clear" hidden>Remove key</button>
-        </form>
-        <p class="muted" id="key-status" style="margin-top:10px"></p>
-      </div>
-      <div class="note" id="coach-off" style="margin-top:16px" hidden></div>
-      <div class="cols-even" style="margin-top:16px">
-        <div class="card">
-          <div class="card-h"><h2>Workout plan</h2><span class="muted" id="plan-workout-when"></span></div>
-          <div class="builder-actions" style="margin:0 0 12px"><button class="btn sm" data-act="plan-gen" data-k="workout" type="button">Build workout plan</button><button class="link stopbtn" data-act="ai-stop" type="button" hidden>Stop</button></div>
-          <div class="md" id="plan-workout-out"></div>
-        </div>
-        <div class="card">
-          <div class="card-h"><h2>Meal plan</h2><span class="muted" id="plan-meal-when"></span></div>
-          <div class="builder-actions" style="margin:0 0 12px"><button class="btn sm" data-act="plan-gen" data-k="meal" type="button">Build meal plan</button><button class="link stopbtn" data-act="ai-stop" type="button" hidden>Stop</button></div>
-          <div class="md" id="plan-meal-out"></div>
-        </div>
-      </div>
-      <div class="card" style="margin-top:16px">
-        <div class="card-h"><h2>Ask your trainer</h2><button class="chip" data-act="chat-check" type="button">Weekly check-in</button></div>
-        <div class="chat-log" id="chat-log" aria-live="polite"></div>
-        <form id="chat-form" class="chat-form">
-          <label class="sr-only" for="chat-in">Message your trainer</label>
-          <input class="in" id="chat-in" maxlength="500" placeholder="Ask about form, swaps, cravings, a plateau…" autocomplete="off">
-          <button class="btn" id="chat-send" type="submit">Send</button>
-          <button class="link stopbtn" data-act="ai-stop" type="button" hidden>Stop</button>
-        </form>
-        <p class="muted" style="margin-top:12px">General fitness and nutrition guidance, not medical advice. If you have a health condition, check with a doctor or dietitian first.</p>
       </div>
     </section>
 
@@ -574,9 +529,13 @@ textarea.in{resize:vertical}
 
   <footer class="foot">
     <p class="muted" id="foot-note"></p>
-    <div class="chips" id="exports" hidden>
-      <button class="chip" data-act="exp-journal" type="button">Export journal</button>
-      <button class="chip" data-act="exp-all" type="button">Back up everything</button>
+    <div class="chips">
+      <span class="chips" id="exports" hidden>
+        <button class="chip" data-act="exp-journal" type="button">Export journal</button>
+        <button class="chip" data-act="exp-all" type="button">Back up everything</button>
+      </span>
+      <button class="chip" data-act="imp-pick" type="button">Restore a backup</button>
+      <input id="imp-file" type="file" accept="application/json,.json" hidden>
     </div>
   </footer>
 </div>
@@ -618,12 +577,12 @@ const ICONS={
   cardio:'<path d="M3 12h4l2-6 4 12 2-6h6"/>',
   journal:'<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3V4z"/><path d="M8 20a3 3 0 01-3-3"/><path d="M9 8h6"/>',
   scale:'<path d="M5 5h14l1 14H4L5 5z"/><path d="M9 10a3 3 0 016 0"/>',
-  coach:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>'
+  body:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>'
 };
 const ic=(n,s)=>'<svg width="'+(s||20)+'" height="'+(s||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICONS[n]+'</svg>';
 
 /* ---------- data layer ---------- */
-const COLS=['habits','habitlogs','goals','workouts','cardio','weights','journal','plans','settings'];
+const COLS=['habits','habitlogs','goals','workouts','cardio','weights','journal','settings'];
 const S={};COLS.forEach(c=>{S[c]={};});
 const loaded=new Set();
 const isLoaded=()=>loaded.size>=COLS.length;
@@ -690,8 +649,8 @@ function delBtn(col,id,label){
 }
 
 /* ---------- navigation ---------- */
-const VIEWS=['today','habits','gym','cardio','coach','journal'];
-const NAMES={today:'Today',habits:'Habits',gym:'Gym',cardio:'Cardio',coach:'Coach',journal:'Journal'};
+const VIEWS=['today','habits','gym','cardio','body','journal'];
+const NAMES={today:'Today',habits:'Habits',gym:'Gym',cardio:'Cardio',body:'Body',journal:'Journal'};
 let view='today';
 $('#nav').innerHTML=VIEWS.map(v=>'<a href="#'+v+'" data-v="'+v+'">'+ic(v,20)+'<span>'+NAMES[v]+'</span></a>').join('');
 function showView(v,scroll){
@@ -705,7 +664,7 @@ function showView(v,scroll){
 }
 window.addEventListener('hashchange',()=>showView(location.hash.slice(1),true));
 function renderCurrent(){
-  ({today:renderToday,habits:renderHabits,gym:renderGym,cardio:renderCardio,coach:renderCoach,journal:renderJournal})[view]();
+  ({today:renderToday,habits:renderHabits,gym:renderGym,cardio:renderCardio,body:renderBody,journal:renderJournal})[view]();
 }
 let rt=0;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(renderCurrent,150);});
 
@@ -1082,21 +1041,12 @@ function spanText(w){
   return 'about '+fmtN(mo/12)+' years';
 }
 let roadPace='auto';
-function fillProfile(pr){
-  const map={age:'#p-age',sex:'#p-sex',height:'#p-height',activity:'#p-activity',days:'#p-days',exp:'#p-exp',equip:'#p-equip',box:'#p-box',diet:'#p-diet',limits:'#p-limits'};
-  Object.keys(map).forEach(k=>{const el=$(map[k]);if(!el||document.activeElement===el)return;if(pr[k]!=null&&pr[k]!==''&&String(el.value)!==String(pr[k]))el.value=pr[k];});
-}
-function readProfile(){
-  return {age:num($('#p-age').value),sex:$('#p-sex').value,height:num($('#p-height').value),activity:$('#p-activity').value,days:$('#p-days').value,exp:$('#p-exp').value,equip:$('#p-equip').value,box:$('#p-box').value,diet:$('#p-diet').value.trim(),limits:$('#p-limits').value.trim()};
-}
-function renderCoach(){
+function renderBody(){
   const c=cfg(),u=c.unit,pr=c.profile||{};
   $('#w-val-l').textContent='Weight ('+u+')';$('#w-goal-u').textContent=u;
   if(document.activeElement!==$('#w-goal'))$('#w-goal').value=c.goalWeight!=null?fmtN(conv(c.goalWeight,c.goalUnit||'lb',u)):'';
-  fillProfile(pr);
-  coachUi();
-  setBusy(aiBusy);
-  renderChat();
+  const he=$('#p-height');
+  if(document.activeElement!==he&&pr.height!=null&&String(he.value)!==String(pr.height))he.value=pr.height;
   if(!isLoaded()){$('#w-stats').innerHTML='<p class="muted">Opening your daybook…</p>';return;}
   const pts=wPts(),gw=c.goalWeight!=null?conv(c.goalWeight,c.goalUnit||'lb',u):null;
   const first=pts[0],last=pts[pts.length-1];
@@ -1154,159 +1104,34 @@ function renderCoach(){
     }
   }
   $('#w-hist').innerHTML=pts.length?pts.slice().reverse().slice(0,10).map(p=>'<li><div style="color:var(--accent);padding-top:2px">'+ic('scale',20)+'</div><div class="hi"><div class="hi-d">'+esc(rel(p.d))+'</div><div class="hi-t num">'+fmtN(p.v)+' '+u+'</div></div><div>'+delBtn('weights',p.d,'weigh-in')+'</div></li>').join(''):'<li><p class="muted">No weigh-ins yet.</p></li>';
-  // plans
-  [['workout','Fill in About you, then build a weekly plan with strength days, boxing rounds and cardio.'],['meal','Get daily calorie and protein targets, a simple week of meals and a grocery list.']].forEach(a=>{
-    const k=a[0],p=S.plans[k];
-    if(!planBusy[k])$('#plan-'+k+'-out').innerHTML=p&&p.text?md(p.text):'<p class="muted">'+a[1]+'</p>';
-    $('#plan-'+k+'-when').textContent=p&&p.created?'Built '+fmtDay(ymd(new Date(p.created)),{month:'short',day:'numeric'}):'';
-  });
 }
 
-/* ---------- TRAINER (Claude) ---------- */
-let coachSample=null,coachChecked=false,aiBusy=false,ctl=null,chatTurns=[],apiKey='';
-try{apiKey=localStorage.getItem('daybook:apikey')||'';}catch(e){}
-const coachReady=()=>!!coachSample||!!apiKey;
-async function apiAsk(input,opt){
-  opt=opt||{};
-  if(!apiKey)throw {code:'no_key'};
-  const msgs=typeof input==='string'?[{role:'user',content:input}]:input.map(m=>({role:m.role,content:m.content}));
-  const merged=[];msgs.forEach(m=>{const l=merged[merged.length-1];if(l&&l.role===m.role)l.content+='\n\n'+m.content;else merged.push({role:m.role,content:m.content});});
-  let res;
-  try{
-    res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',signal:opt.signal,
-      headers:{'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:3000,stream:true,messages:merged})});
-  }catch(e){if(e&&e.name==='AbortError')throw {code:'cancelled'};throw {code:'network'};}
-  if(!res.ok)throw {code:res.status===401||res.status===403?'bad_key':res.status===429?'rate_limited':'api_error'};
-  const reader=res.body.getReader(),dec=new TextDecoder();let buf='',text='',stop='';
-  try{
-    for(;;){
-      const r=await reader.read();if(r.done)break;
-      buf+=dec.decode(r.value,{stream:true});
-      const parts=buf.split('\n');buf=parts.pop();
-      for(let i=0;i<parts.length;i++){
-        const line=parts[i];if(line.indexOf('data:')!==0)continue;
-        const j=line.slice(5).trim();if(!j||j==='[DONE]')continue;
-        let ev;try{ev=JSON.parse(j);}catch(e){continue;}
-        if(ev.type==='content_block_delta'&&ev.delta&&ev.delta.type==='text_delta'){text+=ev.delta.text;if(opt.onText)opt.onText({text:text,delta:ev.delta.text});}
-        else if(ev.type==='message_delta'&&ev.delta&&ev.delta.stop_reason)stop=ev.delta.stop_reason;
-        else if(ev.type==='error')throw {code:'api_error'};
-      }
-    }
-  }catch(e){
-    if(e&&e.name==='AbortError')throw {code:'cancelled',text:text};
-    if(e&&e.code){e.text=text;throw e;}
-    throw {code:'network',text:text};
-  }
-  if(!text.trim())throw {code:'api_error'};
-  return {text:text,truncated:stop==='max_tokens'};
-}
-const coachAsk=(input,opt)=>coachSample?coachSample(input,opt):apiAsk(input,opt);
-function coachUi(){
-  const inClaude=!!window.claude;
-  $('#key-card').hidden=!(coachChecked&&!coachSample&&!inClaude);
-  $('#key-clear').hidden=!apiKey;
-  $('#key-status').textContent=apiKey?'A key is saved in this browser.':'No key saved yet.';
-  const off=$('#coach-off');off.hidden=!(coachChecked&&!coachReady());
-  off.textContent=inClaude?'The trainer is not available in this view. Allow Claude on this page when asked, or reload.':'Add your API key above to turn the trainer on.';
-}
-const planBusy={workout:false,meal:false};
-const RULES='You are a practical, encouraging personal trainer and nutrition coach inside a personal dashboard. Be specific and concise. Format with markdown: ## headings, - bullets and **bold**. No tables, no emoji. Base everything on the DATA below and never invent facts about the person. Use a moderate pace of change (about 0.5 to 1 percent of body weight per week for fat loss) and never recommend crash diets, fasting, or daily calories below roughly 1,500 for men or 1,200 for women. Do not diagnose or give medical advice. If the notes mention a medical condition, pregnancy or an eating disorder history, or the person is under 18, say to check with a doctor or dietitian first. Follow food notes strictly (for example halal, allergies). Warm, direct tone.';
-const WORKOUT_TASK='Build a weekly workout plan toward the goal weight, using the profile. Sections: ## Overview (two sentences on the split and why), ## Week at a glance (one line per day, Monday to Sunday, session or rest), ## Strength days (each strength day with 4 to 6 exercises as sets x reps and rest, matched to equipment, experience and limits), ## Boxing and cardio (beginner friendly: 3-minute rounds with 1 minute rest, shadowboxing, heavy bag, skipping rope; weekly minutes; a low-impact swap; if the person skips boxing use other cardio), ## Progression (plain rules for adding weight or reps each week, and when to deload), ## Recovery (sleep, daily steps). Under 600 words.';
-const MEAL_TASK='Build a nutrition plan toward the goal weight, using the profile. Sections: ## Your targets (estimated daily calories as a range, and protein in grams; one line on how you estimated it, using Mifflin-St Jeor with the activity level and about a 15 to 20 percent deficit for fat loss or about 10 percent surplus for gain; say these are estimates to adjust after 2 to 3 weeks of weigh-ins; if age, sex or height is missing, give a rough range and say to fill in About you), ## Eating pattern (meals per day, protein per meal), ## Sample week (7 days, one line per day: breakfast, lunch, dinner, snack with rough calories; repeat meals to keep it cheap and simple for a student), ## Grocery list (grouped), ## Habits that help (4 bullets). Under 750 words.';
-function md(t){
-  const lines=esc(t).split('\n');let out='',list=false;
-  const inl=s=>s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?![*\w])/g,'$1<em>$2</em>');
-  const close=()=>{if(list){out+='</ul>';list=false;}};
-  lines.forEach(raw=>{
-    const l=raw.replace(/\s+$/,'');let m;
-    if(!l.trim()){close();return;}
-    if((m=l.match(/^#{1,2}\s+(.*)$/))){close();out+='<h3>'+inl(m[1])+'</h3>';return;}
-    if((m=l.match(/^#{3,6}\s+(.*)$/))){close();out+='<h4>'+inl(m[1])+'</h4>';return;}
-    if((m=l.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/))){if(!list){out+='<ul>';list=true;}out+='<li>'+inl(m[1])+'</li>';return;}
-    if(/^\s*-{3,}\s*$/.test(l)){close();return;}
-    close();out+='<p>'+inl(l)+'</p>';
-  });
-  close();return out;
-}
-function aiErr(e){
-  const c=e&&e.code;
-  if(c==='cancelled')return '';
-  if(c==='no_key')return 'Add your API key above to use the trainer.';
-  if(c==='bad_key')return 'Anthropic rejected that key. Check it and save it again.';
-  if(c==='network')return 'Could not reach the Anthropic API. Check your connection and try again.';
-  if(c==='not_granted')return 'Allow Claude on this page to power your trainer, then try again.';
-  if(c==='rate_limited')return 'You have reached a usage limit for now. Try again in a little while.';
-  if(c==='session_expired')return 'Your session expired. Reload the page and sign in again.';
-  if(c==='sampling_disabled'||c==='not_declared'||c==='capability_disabled'||c==='capability_removed')return 'The trainer is not available in this view.';
-  if(c==='refused')return 'Claude could not help with that request. Try rewording it.';
-  return 'Something interrupted the answer. Try again.';
-}
-function setBusy(b){
-  aiBusy=b;
-  $$('[data-act="plan-gen"],[data-act="chat-check"],#chat-send').forEach(x=>{x.disabled=b||!coachReady();});
-  $$('.stopbtn').forEach(x=>{x.hidden=!b;});
-}
-function coachCtx(){
-  const c=cfg(),u=c.unit,pr=c.profile||{},pts=wPts(),gw=c.goalWeight!=null?conv(c.goalWeight,c.goalUnit||'lb',u):null;
-  const rows=[];
-  rows.push('Profile: age '+(pr.age||'unknown')+'; sex '+(pr.sex||'not given')+'; height '+(pr.height?pr.height+' cm':'unknown')+'; day-to-day activity '+(pr.activity||'lightly active')+'; gym days per week '+(pr.days||3)+'; lifting experience '+(pr.exp||'beginner')+'; equipment '+(pr.equip||'full gym')+'; boxing: '+(pr.box||'plans to start')+'; food notes: '+(pr.diet||'none')+'; injuries or limits: '+(pr.limits||'none')+'.');
-  rows.push('Units: '+u+'. Goal weight: '+(gw!=null?fmtN(gw)+' '+u:'not set')+'.');
-  rows.push('Recent weigh-ins ('+u+'): '+(pts.length?pts.slice(-10).map(p=>p.d+' '+fmtN(p.v)).join(', '):'none yet')+'.');
-  const tr=trendPerWeek(pts);if(tr!=null)rows.push('Recent weight trend: '+(tr>0?'+':'')+fmtN(tr)+' '+u+' per week over the last four weeks.');
-  const cut=ymd(addDays(new Date(),-28));
-  const ws=wList().filter(w=>w.date>=cut);
-  rows.push('Gym in the last 4 weeks: '+ws.length+' sessions'+(ws.length?' ('+ws.map(w=>w.name||'session').slice(0,8).join(', ')+')':'')+'.');
-  const ser=exSeries(),tops=Object.keys(ser).map(k=>{const p=ser[k].pts[ser[k].pts.length-1];return {n:ser[k].name,d:p.d,v:p.top};}).sort((a,b)=>a.d<b.d?1:-1).slice(0,6);
-  if(tops.length)rows.push('Latest top weights ('+u+'): '+tops.map(t=>t.n+' '+fmtN(t.v)).join(', ')+'.');
-  const by={};Object.keys(S.cardio).map(k=>S.cardio[k]).filter(x=>x.date>=cut).forEach(x=>{by[x.type]=(by[x.type]||0)+(x.minutes||0);});
-  rows.push('Cardio in the last 4 weeks: '+(Object.keys(by).length?Object.keys(by).map(k=>k+' '+by[k]+' min').join(', '):'none')+'.');
-  const hs=activeHabits(),since=ymd(addDays(new Date(),-13));
-  if(hs.length){const days=[...Array(14)].map((_,i)=>ymd(addDays(new Date(),-i)));rows.push('Habit completion over 14 days: '+hs.map(h=>h.name+' '+days.filter(d=>doneSet(d).has(h.id)).length+'/14').join('; ')+'.');}
-  rows.push('Today is '+new Date().toLocaleDateString(L,{weekday:'long',month:'long',day:'numeric',year:'numeric'})+'.');
-  return rows.join('\n');
-}
-async function genPlan(k){
-  if(!coachReady()||aiBusy)return;
-  const out=$('#plan-'+k+'-out');planBusy[k]=true;setBusy(true);ctl=new AbortController();
-  out.innerHTML='<p class="muted">Thinking…</p>';
-  const prompt=RULES+'\n\nDATA\n'+coachCtx()+'\n\nTASK\n'+(k==='workout'?WORKOUT_TASK:MEAL_TASK);
-  try{
-    const r=await coachAsk(prompt,{signal:ctl.signal,cache:false,onText:u=>{out.innerHTML=md(u.text);}});
-    const pts=wPts();
-    put('plans',k,{text:r.text,created:Date.now(),weight:pts.length?pts[pts.length-1].v:null,unit:cfg().unit});
-    out.innerHTML=md(r.text)+(r.truncated?'<p class="muted">The plan was cut short. Build it again for a fuller version.</p>':'');
-  }catch(e){
-    const m=aiErr(e),prev=(e&&e.text)||(S.plans[k]&&S.plans[k].text)||'';
-    out.innerHTML=(prev?md(prev):'')+(m?'<p class="muted">'+esc(m)+'</p>':'');
-  }finally{planBusy[k]=false;setBusy(false);}
-}
-function renderChat(){
-  const log=$('#chat-log');if(!log)return;
-  const html=chatTurns.map(t=>t.role==='user'?'<div class="bub me">'+esc(t.content)+'</div>':'<div class="bub ai md">'+(t.content?md(t.content):'<p class="muted">Thinking…</p>')+'</div>').join('');
-  if(log.dataset.h!==html){log.dataset.h=html;log.innerHTML=html;log.scrollTop=log.scrollHeight;}
-}
-async function chatSend(text){
-  text=(text||'').trim();if(!text||!coachReady()||aiBusy)return;
-  chatTurns.push({role:'user',content:text});
-  const hist=chatTurns.slice(-9).map(t=>({role:t.role,content:t.content}));
-  const ai={role:'assistant',content:''};chatTurns.push(ai);renderChat();
-  ctl=new AbortController();setBusy(true);
-  try{
-    await coachAsk([{role:'user',content:RULES+'\n\nDATA\n'+coachCtx()}].concat(hist),{signal:ctl.signal,cache:false,onText:u=>{ai.content=u.text;renderChat();}});
-  }catch(e){
-    const m=aiErr(e);
-    ai.content=((e&&e.text)||ai.content||'')+(m?((e&&e.text)||ai.content?'\n\n':'')+m:'');
-    if(!ai.content)chatTurns.pop();
-  }finally{setBusy(false);renderChat();}
-}
-const CHECKIN='Give me my weekly check-in. Look at the last two weeks of weigh-ins, training and habits. Say what is working, the one thing to fix, and next week’s focus. Under 250 words.';
 
 /* ---------- exports ---------- */
 async function exportFile(name,data){
   const d=window.__dl;if(!d)return;
   try{await d.save({filename:name,data:data});toast('Saved');}catch(e){if(!e||e.code!=='declined')toast('Couldn’t save that file');}
 }
+function importBackup(text){
+  let j;
+  try{j=JSON.parse(text);}catch(e){toast('That file is not a Daybook backup');return;}
+  if(!j||typeof j!=='object'||!COLS.some(c=>j[c]&&typeof j[c]==='object')){toast('That file is not a Daybook backup');return;}
+  let n=0;
+  COLS.forEach(col=>{
+    const incoming=j[col];
+    if(!incoming||typeof incoming!=='object')return;
+    Object.keys(incoming).forEach(id=>{
+      const row=incoming[id];
+      if(!row||typeof row!=='object')return;
+      const mine=S[col][id];
+      if(mine&&JSON.stringify(mine)===JSON.stringify(row))return;
+      if(mine&&(mine.updated||mine.created||0)>(row.updated||row.created||0))return;
+      put(col,id,row);n++;
+    });
+  });
+  toast(n?('Restored '+n+(n===1?' entry':' entries')):'Already up to date');
+}
+
 function journalText(){
   return Object.keys(S.journal).filter(k=>journalHas(S.journal[k])).sort().map(k=>{const e=S.journal[k];return fmtDay(k,{weekday:'long',year:'numeric',month:'long',day:'numeric'})+(e.mood?'  ·  Mood: '+MOODS[e.mood-1]:'')+'\n\n'+(e.text||'').trim()+(e.tomorrow?'\n\nFor tomorrow: '+e.tomorrow:'')+'\n';}).join('\n------------------------------\n\n');
 }
@@ -1341,11 +1166,8 @@ const H={
   'j-prompt':()=>{jPrompt=(jPrompt+1)%PROMPTS.length;$('#j-prompt').textContent=PROMPTS[jPrompt];},
   'j-new':()=>{$('#j-search').value='';jOpen(today());$('#j-text').focus();},
   'j-open':t=>{jOpen(t.dataset.d);if(window.innerWidth<=820)$('#j-text').scrollIntoView({behavior:'smooth',block:'center'});},
-  'key-clear':()=>{apiKey='';try{localStorage.removeItem('daybook:apikey');}catch(e){}toast('Key removed');renderCoach();},
-  'r-pace':t=>{roadPace=t.dataset.p;renderCoach();},
-  'plan-gen':t=>genPlan(t.dataset.k),
-  'ai-stop':()=>{if(ctl)ctl.abort();},
-  'chat-check':()=>chatSend(CHECKIN),
+  'r-pace':t=>{roadPace=t.dataset.p;renderBody();},
+  'imp-pick':()=>$('#imp-file').click(),
   'exp-journal':()=>{const t=journalText();if(!t){toast('No journal entries to export yet');return;}exportFile('daybook-journal.txt',t);},
   'exp-all':()=>exportFile('daybook-backup.json',JSON.stringify(S,null,2))
 };
@@ -1395,28 +1217,19 @@ $('#j-search').addEventListener('input',renderJournal);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)jSave();});
 window.addEventListener('pagehide',jSave);
 
-$('#p-form').addEventListener('change',()=>setCfg({profile:readProfile()}));
-$('#key-form').addEventListener('submit',e=>{
-  e.preventDefault();const v=$('#key-in').value.trim();
-  if(v.indexOf('sk-ant-')!==0){toast('That does not look like an Anthropic API key');return;}
-  apiKey=v;$('#key-in').value='';
-  try{localStorage.setItem('daybook:apikey',v);}catch(e2){toast('Saved for this visit only. This browser blocked storage.');}
-  toast('Key saved');renderCoach();
+$('#p-form').addEventListener('change',()=>setCfg({profile:Object.assign({},cfg().profile,{height:num($('#p-height').value)})}));
+$('#imp-file').addEventListener('change',e=>{
+  const f=e.target.files&&e.target.files[0];e.target.value='';
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>importBackup(String(r.result||''));
+  r.onerror=()=>toast('Couldn’t read that file');
+  r.readAsText(f);
 });
-$('#chat-form').addEventListener('submit',e=>{e.preventDefault();if(!coachReady()||aiBusy)return;const v=$('#chat-in').value;$('#chat-in').value='';chatSend(v);});
 
 /* ---------- boot ---------- */
 ['#g-date','#c-date','#w-date'].forEach(s=>{$(s).value=today();$(s).max=today();});
 renderBuilder();
 showView(location.hash.slice(1),false);
-(async()=>{
-  try{
-    const c=window.claude;
-    if(c&&c.use){
-      coachSample=(await c.use('sample'))||null;coachChecked=true;touch();
-    }
-  }catch(e){}
-  coachChecked=true;touch();
-})();
 })();
 </script>

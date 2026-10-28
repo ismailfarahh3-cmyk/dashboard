@@ -8,24 +8,21 @@ A personal dashboard for habits and goals, gym lifts, boxing and cardio, body we
 - **Habits & goals:** weekly tracker with streaks, goals with target dates, 12-week consistency map.
 - **Gym:** log sessions (exercises, sets, weight, reps), per-lift progress charts, session history.
 - **Cardio:** boxing rounds, runs, rides and more, with a weekly minutes target.
-- **Coach:** weigh-ins, a projected timeline to your goal weight with milestones, an AI trainer that builds a workout plan and meal plan, and a chat for questions.
+- **Body:** weigh-ins, a projected timeline to your goal weight with milestones, and a weight chart.
 - **Journal:** a nightly page that saves as you write, with mood, prompts, search and export.
 
 ## How it runs
 
-`index.html` is the whole app: one self-contained page (HTML, CSS and JavaScript). Fonts load from Google Fonts (Young Serif, Nunito, Caveat).
+`index.html` is the whole app: one self-contained page (HTML, CSS and JavaScript). No build step, no dependencies, no backend. Fonts load from Google Fonts (Young Serif, Nunito, Caveat).
 
-**Where your entries are saved**
+It is built mobile-first — a bottom tab bar on phones, top tabs on wider screens — and works offline once the fonts are cached.
 
-- Inside Claude (as an artifact): to your private Claude account, so they follow you between devices.
-- Anywhere else (GitHub Pages, local file): to that browser's `localStorage`. Entries stay on that one browser, and clearing site data erases them. Use the export buttons on the Journal tab to keep a copy.
+## Where your entries are saved
 
-**The AI trainer**
+- Opened as a Claude artifact: to your private Claude account, so they follow you between devices.
+- Anywhere else (GitHub Pages, a local file): to that browser's `localStorage`. Entries stay on that one browser, and clearing site data erases them.
 
-- Inside Claude, it runs on Claude directly. Nothing to set up.
-- Outside Claude, open the Coach tab and paste an [Anthropic API key](https://console.anthropic.com/settings/keys) into "Connect your trainer". Calls are billed to that API account, so set a spending limit on the key.
-
-The key is kept in that browser's `localStorage` only. It is never in this repository, never sent anywhere but `api.anthropic.com`, and anyone with access to that browser profile can read it — so only save a key on a device you trust, and use "Remove key" on a shared machine.
+To move data between the two, use **Back up everything** in the footer on one device and **Restore a backup** on the other. The restore merges rather than overwrites: identical entries are skipped, and where the same entry differs it keeps whichever copy was edited more recently, so importing the same file twice changes nothing.
 
 ## Run locally
 
