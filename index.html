@@ -172,7 +172,7 @@ textarea.in{resize:vertical}
 .stat .v small{font:700 14px var(--f-body);color:var(--ink-3);margin-left:3px}
 .stat .n{font-size:13px;color:var(--ink-3)}
 .mini-in{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2)}
-.mini-in .in{width:76px;min-height:38px;padding:6px 10px;text-align:center}
+.mini-in .in{width:76px;min-height:38px;padding:6px 10px;text-align:center;font-size:16px}
 
 /* gym builder */
 .ex{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--surface-2);display:flex;flex-direction:column;gap:10px}
@@ -249,7 +249,8 @@ textarea.in{resize:vertical}
   .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .tile{padding:14px}
   .tile .val{font-size:24px}
-  .strip{gap:14px}
+  .strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px}
+  .sync{font-size:12.5px}
 }
 @media (prefers-reduced-motion:no-preference){
   .bar>i,.bars .trk i{transition:width .4s ease}
