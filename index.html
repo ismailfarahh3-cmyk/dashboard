@@ -1338,6 +1338,24 @@ $('#imp-file').addEventListener('change',e=>{
   r.readAsText(f);
 });
 
+
+/* ---------- INSTALLABLE APP (home screen + offline) ----------
+   Only outside Claude: inside the artifact these files don't exist and
+   the page is already hosted for us. */
+(function(){
+  if(window.claude)return;
+  const head=document.head||document.documentElement;
+  const link=(rel,href,extra)=>{const l=document.createElement('link');l.rel=rel;l.href=href;if(extra)Object.assign(l,extra);head.appendChild(l);};
+  link('manifest','manifest.json');
+  link('apple-touch-icon','icon-180.png');
+  link('icon','icon-192.png',{type:'image/png',sizes:'192x192'});
+  link('icon','favicon-32.png',{type:'image/png',sizes:'32x32'});
+  const meta=(name,content)=>{const m=document.createElement('meta');m.name=name;m.content=content;head.appendChild(m);};
+  meta('apple-mobile-web-app-status-bar-style','default');
+  if('serviceWorker'in navigator&&window.isSecureContext)
+    window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+})();
+
 /* ---------- boot ---------- */
 ['#g-date','#c-date','#w-date'].forEach(s=>{$(s).value=today();$(s).max=today();});
 renderBuilder();

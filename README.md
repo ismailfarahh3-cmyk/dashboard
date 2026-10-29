@@ -29,6 +29,22 @@ Signing in moves anything already in the browser up to your account, without dup
 
 There is also **Back up everything** / **Restore a backup** in the footer for moving entries by hand. The restore merges rather than overwrites: identical entries are skipped, and where the same entry differs it keeps whichever copy was edited more recently, so importing the same file twice changes nothing.
 
+## Install it on a phone
+
+The page is a installable web app: a manifest, an icon set, and a service
+worker that caches the shell so it opens with no signal.
+
+- **iPhone / iPad:** open the site in **Safari** (it has to be Safari for
+  the install), tap the Share button, scroll down, tap **Add to Home
+  Screen**. It then launches full screen with no browser bar.
+- **Android:** Chrome shows an **Install app** prompt, or use the menu →
+  **Add to Home screen**.
+
+On iOS this also protects your data. Safari clears a normal website's
+local storage after about seven days of not visiting it, but sites added
+to the Home Screen are exempt from that rule. Until Google sign-in is
+configured, installing it is what keeps your entries from being swept up.
+
 ## Run locally
 
 Open `index.html` in a browser, or serve the folder:
